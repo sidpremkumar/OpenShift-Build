@@ -1,0 +1,24 @@
+{
+  "name": "openshift-build",
+  "version": "1.0.0",
+  "description": "CI tests through GitHub API made for OpenShift!",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sidpremkumar/OpenShift-Build.git"
+  },
+  "author": "Sid Premkumar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sidpremkumar/OpenShift-Build/issues"
+  },
+  "homepage": "https://github.com/sidpremkumar/OpenShift-Build#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "github-webhook-handler": "^1.0.0",
+    "node-webhooks": "^1.4.2"
+  }
+}
