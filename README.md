@@ -9,7 +9,8 @@ There are a couple of requirements that your app needs in order to **fully** be 
 1. Your app needs to have a Dockerfile (this setup guide will assume that you have configured your repo on [quay.io](quat.io))
 2. Currently we only support `.py` test files. But you can always call other files inside your `.py` test file. 
     1. Your Python file needs to print 2 lines to standard out as described in our [example](test_data/test.py)
-3. Create a `Dockerfile.build` file and build a quay image from it
+3. Copy the folder `openshift-build` to your app.
+4. Create a `Dockerfile.build` file and build a quay image from it
     1. You can use the example [here](Dockerfile.example)
     1. You will have to modify your Dockerfile in order to not execute your apps default script, rather to run OpenShift-Build
 
