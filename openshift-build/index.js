@@ -1,7 +1,7 @@
 // Global Variables
 APP_NAME=process.env.APP_NAME;
 TEST_COMMAND=process.env.TEST_COMMAND;
-const shell = require('shelljs')
+const shell = require('shelljs');
 var rimraf = require("rimraf");
 const childProcess = require("child_process");
 
