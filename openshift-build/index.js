@@ -20,6 +20,7 @@ module.exports = app => {
     let passed = 'failure';
     let data = 'N/A';
     try {
+      console.log("Cloning repo...");
       // Clone the repo first
       shell.exec(`git clone ${pr.head.repo.git_url} ./temp`);
 
@@ -29,15 +30,18 @@ module.exports = app => {
       // Checkout with our Sha
       shell.exec(`git checkout ${headSha}`);
 
+      console.log("Running tests...");
       // Perform tests and return
       const response = await perform_test();
       passed = response[0];
       data = response[1];
-      console.log(passed, data);
+
       // Format and return
       if (passed=='success') {
         data='OpenShift-Build Passed :)';
       }
+
+      console.log("Pushing results of test...");
       return await context.github.checks.create(context.repo({
         name: APP_NAME,
         head_branch: headBranch,
@@ -88,6 +92,7 @@ module.exports = app => {
     let passed = 'failure';
     let data = 'N/A';
     try {
+      console.log("Cloning repo...");
       // Clone the repo first
       shell.exec(`git clone ${pr.head.repo.git_url} ./temp`);
 
@@ -97,14 +102,18 @@ module.exports = app => {
       // Checkout with our Sha
       shell.exec(`git checkout ${headSha}`);
 
+      console.log("Running tests...");
       // Perform tests and return
       const response = await perform_test();
       passed = response[0];
       data = response[1];
+
       // Format and return
       if (passed=='success') {
         data='OpenShift-Build Passed :)';
       }
+
+      console.log("Pushing results of test...");
       return await context.github.checks.create(context.repo({
         name: APP_NAME,
         head_branch: headBranch,
@@ -115,7 +124,7 @@ module.exports = app => {
         completed_at: new Date(),
         output: {
           title: passed,
-          summary: data
+          summary: data.toString()
         }
       }))
     }
