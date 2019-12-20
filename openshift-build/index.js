@@ -1,6 +1,8 @@
 // Global Variables
 APP_NAME=process.env.APP_NAME;
 TEST_COMMAND=process.env.TEST_COMMAND;
+const shell = require('shelljs')
+var rimraf = require("rimraf");
 const childProcess = require("child_process");
 
 module.exports = app => {
@@ -15,57 +17,119 @@ module.exports = app => {
     const headBranch = pr.head.ref;
     const headSha = pr.head.sha;
 
-    // Perform our tests and get the result
-    const response = await perform_test();
-    const passed = response[0];
-    const data = response[1];
+    let passed = 'failure';
+    let data = 'N/A';
+    try {
+      // Clone the repo first
+      shell.exec(`git clone ${pr.head.repo.git_url} ./temp`);
 
-    // Return check data
-    return context.github.checks.create(context.repo({
-      name: APP_NAME,
-      head_branch: headBranch,
-      head_sha: headSha,
-      status: 'completed',
-      started_at: startTime,
-      conclusion: passed,
-      completed_at: new Date(),
-      output: {
-        title: 'OpenShift-Build Check',
-        summary: data
-      }
-    }))
+      // Move into our temp directory
+      shell.cd('temp');
+
+      // Checkout with our Sha
+      shell.exec(`git checkout ${headSha}`);
+
+      // Perform tests and return
+      const response = await perform_test();
+      passed = response[0];
+      data = response[1];
+      return await context.github.checks.create(context.repo({
+        name: APP_NAME,
+        head_branch: headBranch,
+        head_sha: headSha,
+        status: 'completed',
+        started_at: startTime,
+        conclusion: passed,
+        completed_at: new Date(),
+        output: {
+          title: 'OpenShift-Build Check',
+          summary: data
+        }
+      }))
+    }
+    catch {
+      return await context.github.checks.create(context.repo({
+        name: APP_NAME,
+        head_branch: headBranch,
+        head_sha: headSha,
+        status: 'completed',
+        started_at: startTime,
+        conclusion: passed,
+        completed_at: new Date(),
+        output: {
+          title: 'OpenShift-Build Check',
+          summary: 'Error when cloning or running tests.'
+        }
+      }))
+    }
+    finally {
+      // Delete our cloned repo
+      shell.cd('..');
+      rimraf("temp", function () { console.log("Deleted cloned repo"); });
+    }
   }
 
   // When someone adds a commit to a Pull Request
   app.on(['check_suite.requested', 'check_run.rerequested'], check_suite);
   async function check_suite (context) {
-    // Identify start time
+     // Identify start time
     const startTime = new Date();
 
     // Extract relevant information
-    const check_suite = context.payload.check_run;
-    const headBranch = check_suite.head_branch;
-    const headSha = check_suite.head_sha;
+    const pr = context.payload.pull_request;
+    const headBranch = pr.head.ref;
+    const headSha = pr.head.sha;
 
-    // Perform our tests and get the result
-    const response = await perform_test();
-    const passed = response[0];
-    const data = response[1];
+    let passed = 'failure';
+    let data = 'N/A';
+    try {
+      // Clone the repo first
+      shell.exec(`git clone ${pr.head.repo.git_url} ./temp`);
 
-    // Return check data
-    return context.github.checks.create(context.repo({
-      name: APP_NAME,
-      head_branch: headBranch,
-      head_sha: headSha,
-      status: 'completed',
-      started_at: startTime,
-      conclusion: passed,
-      completed_at: new Date(),
-      output: {
-        title: 'OpenShift-Build Check',
-        summary: data
-      }
-    }))
+      // Move into our temp directory
+      shell.cd('temp');
+
+      // Checkout with our Sha
+      shell.exec(`git checkout ${headSha}`);
+
+      // Perform tests and return
+      const response = await perform_test();
+      passed = response[0];
+      data = response[1];
+      return await context.github.checks.create(context.repo({
+        name: APP_NAME,
+        head_branch: headBranch,
+        head_sha: headSha,
+        status: 'completed',
+        started_at: startTime,
+        conclusion: passed,
+        completed_at: new Date(),
+        output: {
+          title: 'OpenShift-Build Check',
+          summary: data
+        }
+      }))
+    }
+    catch {
+      return await context.github.checks.create(context.repo({
+        name: APP_NAME,
+        head_branch: headBranch,
+        head_sha: headSha,
+        status: 'completed',
+        started_at: startTime,
+        conclusion: passed,
+        completed_at: new Date(),
+        output: {
+          title: 'OpenShift-Build Check',
+          summary: 'Error when cloning or running tests.'
+        }
+      }))
+    }
+    finally {
+      // Delete our cloned repo
+      shell.cd('..');
+      rimraf("temp", function () { console.log("Deleted cloned repo"); });
+    }
   }
 
   function perform_test(){
