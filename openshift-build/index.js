@@ -33,6 +33,11 @@ module.exports = app => {
       const response = await perform_test();
       passed = response[0];
       data = response[1];
+      console.log(passed, data);
+      // Format and return
+      if (passed=='success') {
+        data='OpenShift-Build Passed :)';
+      }
       return await context.github.checks.create(context.repo({
         name: APP_NAME,
         head_branch: headBranch,
@@ -42,8 +47,8 @@ module.exports = app => {
         conclusion: passed,
         completed_at: new Date(),
         output: {
-          title: 'OpenShift-Build Check',
-          summary: data
+          title: passed,
+          summary: data.toString()
         }
       }))
     }
@@ -57,7 +62,7 @@ module.exports = app => {
         conclusion: passed,
         completed_at: new Date(),
         output: {
-          title: 'OpenShift-Build Check',
+          title: passed,
           summary: 'Error when cloning or running tests.'
         }
       }))
@@ -96,6 +101,10 @@ module.exports = app => {
       const response = await perform_test();
       passed = response[0];
       data = response[1];
+      // Format and return
+      if (passed=='success') {
+        data='OpenShift-Build Passed :)';
+      }
       return await context.github.checks.create(context.repo({
         name: APP_NAME,
         head_branch: headBranch,
@@ -105,7 +114,7 @@ module.exports = app => {
         conclusion: passed,
         completed_at: new Date(),
         output: {
-          title: 'OpenShift-Build Check',
+          title: passed,
           summary: data
         }
       }))
@@ -120,7 +129,7 @@ module.exports = app => {
         conclusion: passed,
         completed_at: new Date(),
         output: {
-          title: 'OpenShift-Build Check',
+          title: passed,
           summary: 'Error when cloning or running tests.'
         }
       }))
@@ -136,14 +145,10 @@ module.exports = app => {
     return new Promise(function(resolve, reject) {
      childProcess.exec(TEST_COMMAND, function(error, standardOutput, standardError) {
         if (error) {
-          reject();
-          return;
+          resolve(['failure', error]);
+        } else {
+          resolve(['success', standardOutput]);
         }
-        if (standardError) {
-          reject(standardError);
-          return;
-        }
-        resolve(standardOutput.split("\n"));
       });
     })
   }
