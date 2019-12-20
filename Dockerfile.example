@@ -1,0 +1,6 @@
+# Copy over all code from your apps Dockerfile and add the following lines to the bottom
+USER root
+RUN dnf -y install nodejs
+RUN npm --prefix path/to/openshift-build install
+USER 1001
+CMD ["npm", "--prefix", "path/to/openshift-build", "start"]

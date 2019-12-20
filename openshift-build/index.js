@@ -1,5 +1,7 @@
 // Global Variables
-APP_NAME='OpenShift-Build'
+APP_NAME=process.env.APP_NAME;
+TEST_COMMAND=process.env.TEST_COMMAND;
+const childProcess = require("child_process");
 
 module.exports = app => {
   // When a Pull Request is opened or Re-Opened
@@ -14,7 +16,9 @@ module.exports = app => {
     const headSha = pr.head.sha;
 
     // Perform our tests and get the result
-    // TODO
+    const response = await perform_test();
+    const passed = response[0];
+    const data = response[1];
 
     // Return check data
     return context.github.checks.create(context.repo({
@@ -23,11 +27,11 @@ module.exports = app => {
       head_sha: headSha,
       status: 'completed',
       started_at: startTime,
-      conclusion: 'success',
+      conclusion: passed,
       completed_at: new Date(),
       output: {
-        title: 'Probot check!',
-        summary: 'The check has passed!'
+        title: 'OpenShift-Build Check',
+        summary: data
       }
     }))
   }
@@ -44,7 +48,9 @@ module.exports = app => {
     const headSha = check_suite.head_sha;
 
     // Perform our tests and get the result
-    // TODO
+    const response = await perform_test();
+    const passed = response[0];
+    const data = response[1];
 
     // Return check data
     return context.github.checks.create(context.repo({
@@ -53,18 +59,28 @@ module.exports = app => {
       head_sha: headSha,
       status: 'completed',
       started_at: startTime,
-      conclusion: 'success',
+      conclusion: passed,
       completed_at: new Date(),
       output: {
-        title: 'Probot check!',
-        summary: 'The check has passed!'
+        title: 'OpenShift-Build Check',
+        summary: data
       }
     }))
-  };
+  }
 
-  // For more information on building apps:
-  // https://probot.github.io/docs/
-
-  // To get your app running against GitHub, see:
-  // https://probot.github.io/docs/development/
-}
+  function perform_test(){
+    return new Promise(function(resolve, reject) {
+     childProcess.exec(TEST_COMMAND, function(error, standardOutput, standardError) {
+        if (error) {
+          reject();
+          return;
+        }
+        if (standardError) {
+          reject(standardError);
+          return;
+        }
+        resolve(standardOutput.split("\n"));
+      });
+    })
+  }
+};
