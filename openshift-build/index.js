@@ -17,6 +17,15 @@ module.exports = app => {
     const headBranch = pr.head.ref;
     const headSha = pr.head.sha;
 
+    // Mark the check as pending
+    await context.github.checks.create(context.repo({
+        name: APP_NAME,
+        head_branch: headBranch,
+        head_sha: headSha,
+        status: 'in_progress',
+        started_at: startTime,
+    }));
+
     let passed = 'failure';
     let data = 'N/A';
     try {
@@ -91,7 +100,16 @@ module.exports = app => {
     }
     const headBranch = pr.head_branch;
     const headSha = pr.head_sha;
-    
+
+    // Mark the check as pending
+    await context.github.checks.create(context.repo({
+        name: APP_NAME,
+        head_branch: headBranch,
+        head_sha: headSha,
+        status: 'in_progress',
+        started_at: startTime,
+      }));
+
     let passed = 'failure';
     let data = 'N/A';
     try {
