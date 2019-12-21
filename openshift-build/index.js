@@ -85,16 +85,16 @@ module.exports = app => {
     const startTime = new Date();
 
     // Extract relevant information
-    const pr = context.payload.pull_request;
-    const headBranch = pr.head.ref;
-    const headSha = pr.head.sha;
-
+    const pr = context.payload.check_suite;
+    const headBranch = pr.head_branch;
+    const headSha = pr.head_sha;
+    
     let passed = 'failure';
     let data = 'N/A';
     try {
       console.log("Cloning repo...");
       // Clone the repo first
-      shell.exec(`git clone ${pr.head.repo.git_url} ./temp`);
+      shell.exec(`git clone ${context.payload.repository.git_url} ./temp`);
 
       // Move into our temp directory
       shell.cd('temp');
