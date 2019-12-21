@@ -85,7 +85,10 @@ module.exports = app => {
     const startTime = new Date();
 
     // Extract relevant information
-    const pr = context.payload.check_suite;
+    let pr = context.payload.check_suite;
+    if (typeof pr == 'undefined') {
+      pr = context.payload.check_run
+    }
     const headBranch = pr.head_branch;
     const headSha = pr.head_sha;
     
