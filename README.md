@@ -59,6 +59,10 @@ npm start
 ```
 If all variables in `.env` are set correctly the app should start listening for checks.
 
+## Used In
+Currenty OpenShift-Build is used in: 
+* [Sync2Jira](https://github.com/sidpremkumar/Sync2Jira)
+
 ## License
 
 [ISC](LICENSE) © 2019 Sidhartha Premkumar <sid.premkumar@gmail.com>
